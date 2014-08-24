@@ -1,0 +1,44 @@
+#!/bin/sh
+timestamp=$(date '+%e. %B %Y um %R Uhr')
+cat <<*****
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <title>Eckis Nachlass &ndash; Möbel</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <link href="../style.css" rel="stylesheet" type="text/css" />
+  </head>
+<body>
+<div class="page">
+<div class="page_margins">
+*****
+echo "<div class="datum">zuletzt aktualisiert am $timestamp</div>"
+cat <<*****
+
+<h1>Eckis Nachlass &ndash; Möbel</h1>
+
+<p>Bitte auf die Bilder klicken, um sie in groß zu sehen!</p>
+
+<p>
+*****
+
+bilder=$(ls *.jpg)
+for jpgname in $bilder ;do
+    label=$(echo $jpgname | sed -ne 's/^\([a-z]\+\)[0-9][0-9][0-9]\.jpg/\1/p')
+    number=$(echo $jpgname | sed -ne 's/^[a-z]\+\([0-9][0-9][0-9]\)\.jpg/\1/p')
+    if [ -z "$label" -o -z "$number" -o "$label" = "symbol" ] ;then
+        continue
+    fi
+    text=$(exiftool -b -Caption-Abstract $jpgname)
+    echo -n '<div class="vorschau">'$text'<br/><a href="'$label$number.jpg'"><img src="'vorschau-$label$number.jpg'" alt="'$label$number.jpg'" /></a></div>'
+done
+
+cat <<*****
+</p>
+
+</div><!-- class="page_margins" -->
+</div><!-- class="page" -->
+</body>
+</html>
+*****

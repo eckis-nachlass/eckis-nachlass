@@ -1,0 +1,63 @@
+#!/bin/sh
+if [ "$#" -eq "0" ] ;then
+    echo "Usage: $0 teppiche/*.jpg"
+fi
+for infile in "$@" ;do
+    label=$(echo $infile | sed -ne 's/^\([a-z]\+\)[0-9][0-9][0-9]\.jpg/\1/p')
+    if [ -z "$label" ] ;then
+        label=$(echo $infile | sed -ne 's/^[a-z]\+\/\([a-z]\+\)[0-9][0-9][0-9]\.jpg/\1/p')
+        symbol=$(echo $infile | sed -ne 's/^\([a-z]\+\)\/[a-z]\+[0-9][0-9][0-9]\.jpg/\1/p')
+    fi
+    if [ -z "$label" ] ;then
+        continue
+    fi
+    echo Label=\"$label\"
+    echo Symbol=\"$symbol\"
+
+    if [ "$label" = "teppiche" ] ;then
+        name="Teppich"
+    elif [ "$label" = "moebel" ] ;then
+        name="Möbel"
+    elif [ "$label" = "taschen" ] ;then
+        name="Tasche"
+    elif [ "$label" = "audiocds" ] ;then
+        name="AudioCDs"
+    elif [ "$label" = "buecher" ] ;then
+        name="Bücher"
+    elif [ "$label" = "dvds" ] ;then
+        name="DVDs"
+    elif [ "$label" = "noten" ] ;then
+        name="Noten"
+    elif [ "$label" = "schallplatten" ] ;then
+        name="Schallplatten"
+    elif [ "$label" = "symbol" ] ;then
+        name="Symbol"
+        if [ "$symbol" = "teppiche" ] ;then
+            name="Teppiche"
+        elif [ "$symbol" = "moebel" ] ;then
+            name="Möbel"
+        elif [ "$symbol" = "taschen" ] ;then
+            name="Taschen, Koffer ..."
+        else
+            name="?Symbol?"
+        fi
+    else
+        name="???"
+    fi
+    number=$(echo $infile | sed -ne 's/[a-z/]\+\([0-9][0-9][0-9]\)\.jpg/\1/p')
+    if [ -z "$number" ] ;then
+        echo Skipping "$infile" because number is ">>$number<<"
+        continue
+    else
+        echo number=$number
+    fi
+    altertext=$(exiftool -b -Caption-Abstract "$infile")
+    echo Alter Text = '>>>'$altertext'<<<'
+    read -p "$name $number: " neuertext
+    if [ ! -z "$neuertext" ] ;then
+        echo exiftool -Caption-Abstract="\"$name $number: $neuertext\"" $infile
+        exiftool -Caption-Abstract="$name $number: $neuertext" $infile
+    else
+        echo skipping ...
+    fi
+done

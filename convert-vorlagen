@@ -1,0 +1,25 @@
+#!/bin/sh
+if [ "$#" -eq "0" ] ;then
+    echo "Usage: $0 teppiche-vorlagen/*.JPG"
+fi
+for infile in "$@" ;do
+    if [ ! -e "$infile" ] ;then
+        echo "Datei existiert nicht."
+        exit 1
+    fi
+    if [ -d "$infile" ] ;then
+        echo "Bitte einzelne JPG-Dateien angeben."
+        exit 2
+    fi
+    outfile=$(echo $infile | sed -ne 's/\([a-z]\+\)-vorlagen\/P1060\([0-9][0-9][0-9]\)\.JPG/\1\/\1\2.jpg/p')
+    if [ -z "$outfile" ] ;then
+        outfile=$(echo $infile | sed -ne 's/P1060\([0-9][0-9][0-9]\)\.JPG/output\1.jpg/p')
+    fi
+    if [ -e "$outfile" ] ;then
+        echo "Datei $outfile existiert schon."
+        continue
+    fi
+    # echo gm convert $infile -scale 50% -quality 60 $outfile
+    echo gm convert $infile -resize 1280x960 -quality 60 $outfile
+    gm convert $infile -resize 1280x960 -quality 60 $outfile
+done

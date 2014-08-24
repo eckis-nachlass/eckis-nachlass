@@ -1,0 +1,5 @@
+# robots.txt zu http://eckis-nachlass.github.io/
+
+User-agent: *
+Disallow: /
+

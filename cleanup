@@ -1,0 +1,37 @@
+#!/bin/sh
+if [ "$#" -eq "0" ] ;then
+    echo "Usage: $0 teppiche/vorschau-*.jpg"
+fi
+for destfile in "$@" ;do
+#    if [ ! -e "$destfile" ] ;then
+#        echo "Datei existiert nicht."
+#        exit 1
+#    fi
+    if [ -d "$destfile" ] ;then
+        echo "Bitte einzelne JPG-Dateien angeben."
+        exit 2
+    fi
+    tchfile=$(echo $destfile | sed -ne 's/^\([a-z]\+\)\/vorschau-.\+\.jpg/\1\/cleaned/p')
+    if [ -z "$tchfile" ] ;then
+        tchfile=$(echo $destfile | sed -ne 's/^vorschau-.\+\.jpg/cleaned/p')
+    fi
+    if [ -n "$tchfile" ] ;then
+	if [ ! -e "$tchfile" ] ;then
+	    echo touch "$tchfile"
+	    touch "$tchfile"
+	fi
+    fi
+    srcfile=$(echo $destfile | sed -ne 's/^\([a-z]\+\)\/vorschau-\([a-z]\+\)\([0-9][0-9][0-9]\)\.jpg/\1\/\2\3.jpg/p')
+    if [ -z "$srcfile" ] ;then
+        srcfile=$(echo $destfile | sed -ne 's/^vorschau-\([a-z]\+\)\([0-9][0-9][0-9]\)\.jpg/\1\2\.jpg/p')
+    fi
+    if [ -z "$srcfile" ] ;then
+        continue
+    fi
+    if [ ! -e "$srcfile" ] ;then
+        echo rm "$destfile"
+        rm "$destfile"
+        echo touch "$tchfile"
+        touch "$tchfile"
+    fi
+done

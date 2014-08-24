@@ -1,0 +1,109 @@
+#!/bin/sh
+timestamp=$(date '+%e. %B %Y um %R Uhr')
+cat <<*****
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <title>Eckis Nachlass &ndash; Übersicht</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <link href="style.css" rel="stylesheet" type="text/css" />
+  </head>
+<body>
+<div class="page">
+<div class="page_margins_startseite">
+<div class="banner"><img src="grabplatte.jpg" /></div>
+*****
+echo "<div class="datum">zuletzt aktualisiert am $timestamp</div>"
+cat <<*****
+
+<h1>Eckis Nachlass &ndash; Übersicht</h1>
+
+<p>Hallo ihr Hinterbliebenen, ob nun verwandt oder befreundet mit dem
+Verstorbenen!  Für den Fall, dass wir seine Wohnung plötzlich räumen
+müssen, wüsste ich gerne, wo die Sachen alle hin sollen.  Ich bitte
+euch deshalb, mir zu jedem der abgebildeten Gegenstände zu sagen,
+
+<ol>
+<li>ob ihr den Gegenstandt <strong>gerne haben</strong> wollt,
+<li>ob ihr ihn <strong>noch gebrauchen (oder verbrauchen)</strong> könnt,
+<li>oder ob ihr ihn nehmen würdet, <strong>wenn sonst niemand</strong>
+ihn haben will.
+</ol>
+
+<p>Falls einen Gegenstand niemand haben will, blüht ihm eines von zwei
+Schicksalen, was ich jeweils über dem Bild notiert habe:
+
+<ol>
+<li>Entweder die <strong>RecyclingBörse</strong> holt den Gegenstand
+kostenlos ab, um ihn zu verkaufen,
+<li>oder er kommt für 100 Euro pro Tonne in den <strong>Sperrmüll.</strong>
+</ol>
+
+<p>Ihr könnt mir eure Auswahl per E-Mail mitteilen.  Bitte Bild-Nummern
+angeben!  Ich arbeite das dann in diese Webseiten ein (mein
+Poor-Man's-Content-Management-System).
+
+<p>Ihr könnt mir das natürlich auch unter 0160&nbsp;3303903 sagen.  Aber
+am besten besucht ihr mich in der Wohnung des Verstorbenen.  Für die
+Bücher, Noten, Schallplatten, Audio-CDs, DVDs und die Küchengeräte
+ist das sowieso nötig, weil ich die nicht katalogisiert habe.
+
+<p class="display">Bitte auf die Bilder klicken, um Näheres zu erfahren!</p>
+
+<p>
+*****
+
+if [ $# -gt 0 ] ;then
+    # Die Ordnerliste bitte ins Makefile schreiben!
+    ordnerliste="$@"
+else
+    # Dies nutzen wir, wenn generate-index ohne Parameter aufgerufen wird:
+    ordnerliste=$(ls -d *)
+fi
+for dirname in $ordnerliste ;do
+    if [ ! -d "$dirname" ] ;then
+        # echo $dirname ist kein Ordner
+        continue
+    fi
+    ordner=$(echo -n $dirname | sed -ne 's/^\([a-z]\+\)$/\1/p')
+    if [ -z "$ordner" ] ;then
+        # echo $dirname besteht nicht nur aus Kleinbuchstaben
+        continue
+    fi
+    symbolliste=$(echo $ordner/symbol[0-9][0-9][0-9].jpg)
+    for symbolname in $symbolliste ;do
+        if [ ! -e "$symbolname" ] ;then
+            # echo Datei "$symbolname" existiert nicht
+            continue
+        fi
+        number=$(echo $symbolname | sed -ne 's/^[a-z]\+\/[a-z]\+\([0-9][0-9][0-9]\)\.jpg/\1/p')
+        text=$(exiftool -b -Caption-Abstract $symbolname)
+        echo -n '<div class="symbol">'$text'<br/><a href="'$ordner/index.html'"><img src="'$ordner/symbol-symbol$number.jpg'" alt="'$ordner/symbol$number.jpg'" /></a></div>'
+    done
+done
+
+echo '</p>'
+echo '<hr/>'
+echo '<h3>Nicht katalogisiert</h3>'
+echo '<p>'
+
+symbole=$(ls symbole/*.jpg)
+for jpgname in $symbole ;do
+    label=$(echo $jpgname | sed -ne 's/symbole\/\([a-z]\+\)[0-9][0-9][0-9]\.jpg/\1/p')
+    number=$(echo $jpgname | sed -ne 's/symbole\/[a-z]\+\([0-9][0-9][0-9]\)\.jpg/\1/p')
+    if [ -z "$label" -o -z "$number" ] ;then
+        continue
+    fi
+    text=$(exiftool -b -Caption-Abstract $jpgname)
+    echo -n '<div class="symbol">'$text'<br/><a href="'symbole/$label$number.jpg'"><img src="'symbole/symbol-$label$number.jpg'" alt="'$label$number.jpg'" /></a></div>'
+done
+
+cat <<*****
+</p>
+
+</div><!-- class="page_margins" -->
+</div><!-- class="page" -->
+</body>
+</html>
+*****

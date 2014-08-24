@@ -1,0 +1,78 @@
+#!/bin/sh
+if [ "$#" -eq "0" ] ;then
+    echo "Usage: $0 teppiche-vorlagen/ moebel-vorlagen/ ..."
+fi
+for vorlagen in "$@" ;do
+    srcdir=$(echo $vorlagen | sed -ne 's/^\([a-z]\+-vorlagen\)\/\?/\1/p')
+    dstdir=$(echo $vorlagen | sed -ne 's/^\([a-z]\+\)-vorlagen\/\?/\1/p')
+    # echo " dstdir = \"$dstdir\", srcdir = \"$srcdir\""
+    if [ -z "$dstdir" -o -z "$srcdir" ] ;then
+        echo "Usage: $0 teppiche-vorlagen/ moebel-vorlagen/ ..."
+        exit 1
+    fi
+    if [ "$dstdir" = "symbole" ] ;then
+        continue
+    fi
+    if [ ! -e "$srcdir" ] ;then
+        echo "Ordner \"$srcdir\" existiert nicht."
+        continue
+    elif [ ! -d "$srcdir" ] ;then
+        echo "\"$srcdir\" muss ein Ordner sein."
+        continue
+    elif [ ! -e "$dstdir"  ] ;then
+        echo "Ordner \"$dstdir\" existiert nicht."
+        continue
+    elif [ ! -d "$dstdir" ] ;then
+        echo "\"$dstdir\" muss ein Ordner sein."
+        continue
+    fi
+    # echo "comparing \"$srcdir\" and \"$dstdir\" ..."
+    for vorlage in $srcdir/*.JPG ;do
+        ergebnis=$(echo $vorlage | sed -ne "s/^$srcdir\/P1060\([0-9]\+\)\.JPG/$dstdir\/$dstdir\1.jpg/p")
+        # symbol=$(echo $vorlage | sed -ne "s/^$srcdir\/P1060\([0-9]\+\)\.JPG/$dstdir\/symbol\1.jpg/p")
+        # echo "vorlage = \"$vorlage\", ergebnis = \"$ergebnis\", symbol = \"$symbol\""
+        if [ "$vorlage" = "$srcdir"'/*.JPG' ] ;then
+            echo "Ordner \"$srcdir\" ist leer."
+        elif [ -z "$vorlage" -o -z "$ergebnis" ] ;then
+            echo "Programmierfehler"
+        elif [ ! -e "$ergebnis" ] ;then
+            symbol=$(echo $vorlage | sed -ne "s/^$srcdir\/P1060\([0-9]\+\)\.JPG/$dstdir\/symbol\1.jpg/p")
+            if [ -e "$symbol" ] ;then
+                # echo "Datei \"$ergebnis\" existiert nicht, aber \"$symbol\" existiert."
+                continue
+            else
+                echo "Weder \"$ergebnis\" noch \"$symbol\" existiert."
+            fi
+        fi
+    done
+    nosymbols=0
+    # echo "nosymbols = \"$nosymbols\" (0)"
+    for ergebnis in $dstdir/*.jpg ;do
+        vorlage=$(echo $ergebnis | sed -ne "s/^$dstdir\/$dstdir\([0-9]\+\)\.jpg/$srcdir\/P1060\1.JPG/p")
+        symbol_vorlage=$(echo $ergebnis | sed -ne "s/^$dstdir\/symbol\([0-9]\+\)\.jpg/$srcdir\/P1060\1.JPG/p")
+        # echo " ergebnis = \"$ergebnis\", vorlage = \"$vorlage\", symbol_vorlage = \"$symbol_vorlage\""
+        if [ -n "$vorlage" ] ;then
+            if [ ! -e "$vorlage" ] ;then
+                echo "Die Vorlage für \"$ergebnis\" existiert nicht mehr.  Bitte löschen!"
+            fi
+        fi
+        if [ -n "$symbol_vorlage" ] ;then
+            if [ $nosymbols -lt 1 ] ;then
+                nosymbols=1
+                # echo "nosymbols = \"$nosymbols\" (1)"
+            elif [ $nosymbols -ge 1 ]; then
+                nosymbols=2
+                # echo "nosymbols = \"$nosymbols\" (2)"
+            fi
+            if [ ! -e "$symbol_vorlage" ] ;then
+                echo "Die Vorlage für \"$ergebnis\" existiert nicht mehr. Bitte löschen!"
+            fi
+        fi
+    done
+    if [ $nosymbols -lt 1 ] ;then
+        echo "Da ist kein Symbol im Ordner \"$dstdir\"."
+    elif [ $nosymbols -gt 1 ] ;then
+        echo "Da sind mehr als ein Symbol im Ordner \"$dstdir\"."
+    fi
+done
+

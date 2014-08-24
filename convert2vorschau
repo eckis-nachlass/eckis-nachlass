@@ -1,0 +1,31 @@
+#!/bin/sh
+if [ "$#" -eq "0" ] ;then
+    echo "Usage: $0 teppiche/*.jpg"
+fi
+for infile in "$@" ;do
+    if [ ! -e "$infile" ] ;then
+        echo "Datei existiert nicht."
+        exit 1
+    fi
+    if [ -d "$infile" ] ;then
+        echo "Bitte einzelne JPG-Dateien angeben."
+        exit 2
+    fi
+    outfile=$(echo $infile | sed -ne 's/^\([a-z]\+\)\/\([a-z]\+\)\([0-9][0-9][0-9]\)\.jpg/\1\/vorschau-\2\3.jpg/p')
+    if [ -z "$outfile" ] ;then
+        outfile=$(echo $infile | sed -ne 's/^\([a-z]\+\)\([0-9][0-9][0-9]\)\.jpg/vorschau-\1\2\.jpg/p')
+    fi
+    if [ -z "$outfile" ] ;then
+        continue
+    fi
+    if [ -e "$outfile" ] ;then
+        if [ ! "$infile" -nt "$outfile" ] ;then
+            echo "Datei $infile ist nicht neuer als ${outfile}."
+            continue
+        fi
+    fi
+    echo gm convert $infile -scale 20% -quality 60 $outfile
+    gm convert $infile -scale 20% -quality 60 $outfile
+    echo exiftool -TagsFromFile $infile -Caption-Abstract $outfile
+    exiftool -TagsFromFile $infile -Caption-Abstract $outfile
+done
