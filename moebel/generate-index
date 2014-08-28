@@ -13,7 +13,7 @@ cat <<*****
 <div class="page">
 <div class="page_margins">
 *****
-echo "<div class="datum">zuletzt aktualisiert am $timestamp</div>"
+echo "<div class=\"datum\">zuletzt aktualisiert am $timestamp</div>"
 cat <<*****
 
 <h1>Eckis Nachlass &ndash; Möbel</h1>

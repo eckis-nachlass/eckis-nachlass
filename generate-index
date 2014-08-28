@@ -13,8 +13,15 @@ cat <<*****
 <div class="page">
 <div class="page_margins_startseite">
 <div class="banner"><img src="grabplatte.jpg" /></div>
+<div class="datum">zuletzt aktualisiert am $timestamp</div>
 *****
-echo "<div class="datum">zuletzt aktualisiert am $timestamp</div>"
+echo -n "<p><a href=\"changelog.html\">Neuigkeiten</a>"
+if [ -n "$NAMENSLISTE" ] ;then
+    for name in $NAMENSLISTE ;do
+        echo -n " &ndash; <a href=\"$name.html\">$name</a>"
+    done
+fi
+echo "</p>"
 cat <<*****
 
 <h1>Eckis Nachlass &ndash; Übersicht</h1>

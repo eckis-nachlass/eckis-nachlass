@@ -1,0 +1,68 @@
+#!/bin/sh
+#find ./ '!' -regex '\./versteckt/.*' -a -regex '.*/[a-z]+[0-9]+.jpg' -printf '-p %h/%f:$Caption-Abstract %h/%f\n' | sort | xargs -n 3 exiftool
+if [ $# -ne 1 -o -z "$1" ] ;then
+    echo Usage: $0 changelog/ > /dev/stderr
+    exit 1
+elif [ ! -d "$1" ] ;then
+    echo Parameter "$1" muss ein Ordner sein. > /dev/stderr
+    exit 2
+fi
+ordner="$1"
+datum=$(date +%F_%H%M)
+
+stockname="$ordner/stock-$datum"
+changename="$ordner/change-$datum"
+stock_empty="$ordner/change-1970-01-01_0000"
+stock_vorletzt=""
+stock_letzt=""
+find ./ '!' -regex '\./versteckt/.*' -a -regex '.*/[a-z]+[0-9]+.jpg' -exec exiftool -p '{}  $Caption-Abstract' '{}' ';' | sort > $stockname
+for filename in $ordner/stock-* ;do
+    stock_vorletzt="$stock_letzt"
+    stock_letzt="$filename"
+done
+if [ -z "$stock_vorletzt" ] ;then
+    touch "$stock_empty"
+    stock_vorletzt="$stock_empty"
+fi
+diff $stock_vorletzt $stock_letzt > $changename
+rm -f "$stock_empty"
+
+cat <<*****
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <title>Eckis Nachlass &ndash; Neuigkeiten</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <link href="style.css" rel="stylesheet" type="text/css" />
+  </head>
+<body>
+<div class="page">
+<div class="page_margins_startseite">
+
+<h1>Eckis Nachlass &ndash; Neuigkeiten</h1>
+
+<p>Unter jedem Datum sind die Bilder verzeichnet, die jeweils neu
+hinzugekommen sind oder deren Beschriftung sich geändert hat.</p>
+
+<dl>
+*****
+
+filelist=$(ls -r $ordner/change-*)
+for infile in $filelist ;do
+    # echo infile=$infile
+    datum=$(echo $infile | sed -ne "s/${ordner}"'\/change-\([0-9-]\+\)_\([0-9][0-9]\)\([0-9][0-9]\)$/\1  \2:\3 Uhr/p')
+    echo "<dt>$datum</dt>"
+    echo "<dd>"
+    cat $infile | sed -ne 's/> \.\/\([a-z0-9\/\.]\+\)  \(.\+\)$/<p><a href="\1">\2<\/a><\/p>/p'
+    echo "</dd>"
+done
+
+cat <<*****
+</dl>
+
+</div><!-- class="page_margins" -->
+</div><!-- class="page" -->
+</body>
+</html>
+*****

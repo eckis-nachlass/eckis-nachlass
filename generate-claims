@@ -1,0 +1,59 @@
+#!/bin/sh
+if [ $# -lt 2 -o -z "$1" -o -z "$2" ] ;then
+    echo Usage: $0 changelog Anne Carsten Jan ... > /dev/stderr
+    exit 1
+elif [ ! -d "$1" ] ;then
+    echo Parameter "$1" muss ein Ordner sein. > /dev/stderr
+    exit 2
+fi
+ordner="$1"
+shift
+namensliste="$@"
+timestamp=$(date '+%e. %B %Y um %R Uhr')
+
+stock_letzt=""
+for filename in $ordner/stock-* ;do
+    stock_letzt="$filename"
+done
+if [ -z "$stock_letzt" -o ! -e "$stock_letzt" ] ;then
+    # echo "stock_letzt=$stock_letzt"
+    echo "Keine stock-Dateien in $ordner vorhanden.  Bitte generate-changelog aufrufen." > /dev/stderr
+    exit 3
+else
+    stockfile="$stock_letzt"
+    echo "Verwende stock-Datei $stockfile" > /dev/stderr
+fi
+
+for name in $namensliste ;do
+    outfile="$name.html"
+    echo "Erzeuge $outfile" > /dev/stderr
+cat > $outfile <<*****
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <title>Eckis Nachlass &ndash; $name</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <link href="style.css" rel="stylesheet" type="text/css" />
+  </head>
+<body>
+<div class="page">
+<div class="page_margins_startseite">
+<div class="datum">zuletzt aktualisiert am $timestamp</div>
+
+<h1>Eckis Nachlass &ndash; Auswahl von $name</h1>
+
+<p>Gegenstände, an denen $name Interesse bekundet hat:</p>
+
+*****
+
+cat $stockfile | grep $name | sed -ne 's/\.\/\([a-z0-9\/\.]\+\)  \(.\+\)$/<p class="auswahl"><a href="\1">\2<\/a><\/p>/p' >> $outfile
+
+cat >> $outfile <<*****
+
+</div><!-- class="page_margins" -->
+</div><!-- class="page" -->
+</body>
+</html>
+*****
+done

@@ -37,4 +37,14 @@ h6 { font-size:116.67%; }
     display: inline-block; text-align: center; width: 266px;
     margin: 2px; padding: 1px; border: 2px solid gray;
 }
+dt { margin-top: 1ex; margin-bottom: 0px; }
+dd { margin-top: 0px; }
+dd p {
+    margin-left: 2em; margin-top: 0px; margin-bottom: 0px;
+    text-indent: -2em;
+}
+p.auswahl {
+    margin-left: 2em; margin-top: 0.5ex; margin-bottom: 0.5ex;
+    text-indent: -2em;
+}
 
