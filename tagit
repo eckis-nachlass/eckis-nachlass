@@ -20,6 +20,8 @@ for infile in "$@" ;do
         name="Möbel"
     elif [ "$label" = "taschen" ] ;then
         name="Tasche"
+    elif [ "$label" = "besonderes" ] ;then
+        name="Besonderes"
     elif [ "$label" = "audiocds" ] ;then
         name="AudioCDs"
     elif [ "$label" = "buecher" ] ;then
@@ -38,6 +40,8 @@ for infile in "$@" ;do
             name="Möbel"
         elif [ "$symbol" = "taschen" ] ;then
             name="Taschen, Koffer ..."
+        elif [ "$symbol" = "besonderes" ] ;then
+            name="Besonderes ..."
         else
             name="?Symbol?"
         fi

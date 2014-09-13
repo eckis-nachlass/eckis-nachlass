@@ -1,5 +1,5 @@
-namensliste=Anne Carsten Jan
-ordnerliste=moebel teppiche taschen
+namensliste=Anne Carsten Jan Lilli
+ordnerliste=moebel teppiche besonderes taschen
 destination_prefix=../eckis-nachlass.github.io
 destination=$(destination_prefix)
 gitprojektordner=../eckis-nachlass
