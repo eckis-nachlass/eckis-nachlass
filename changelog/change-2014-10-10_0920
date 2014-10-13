@@ -1,0 +1,6 @@
+26,27c26,27
+< ./moebel/moebel154.jpg  Möbel 154: zwei Bücherborde; kann Jan noch gebrauchen
+< ./moebel/moebel155.jpg  Möbel 155: Bücherbord; kann Jan noch gebrauchen
+---
+> ./moebel/moebel154.jpg  Möbel 154: zwei Bücherborde, Grundfläche jeweils 120x40 cm, Aufsatztiefe 25 cm, Höhe 212 cm, davon Unterschrank 38 cm; kann Jan noch gebrauchen
+> ./moebel/moebel155.jpg  Möbel 155: Bücherbord, Grundfläche 120x40 cm, Aufsatztiefe 25 cm, Höhe 98 cm, davon Unterschrank 38 cm; kann Jan noch gebrauchen
