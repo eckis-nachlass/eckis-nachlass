@@ -22,6 +22,10 @@ for infile in "$@" ;do
         name="Tasche"
     elif [ "$label" = "besonderes" ] ;then
         name="Besonderes"
+    elif [ "$label" = "nicolai" ] ;then
+        name="Martin Nicolai"
+    elif [ "$label" = "bilder" ] ;then
+        name="Bild"
     elif [ "$label" = "audiocds" ] ;then
         name="AudioCDs"
     elif [ "$label" = "buecher" ] ;then
@@ -42,6 +46,14 @@ for infile in "$@" ;do
             name="Taschen, Koffer ..."
         elif [ "$symbol" = "besonderes" ] ;then
             name="Besonderes ..."
+        elif [ "$symbol" = "nicolai" ] ;then
+            name="Bilder von Martin Nicolai"
+        elif [ "$symbol" = "bilder" ] ;then
+            name="Gemälde, Drucke, ..."
+        elif [ "$symbol" = "audiocds" ] ;then
+            name="AudioCDs"
+        elif [ "$symbol" = "buecher" ] ;then
+            name="Bücher"
         else
             name="?Symbol?"
         fi

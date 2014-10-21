@@ -1,5 +1,5 @@
-namensliste=Anne Carsten Jan Lilli
-ordnerliste=moebel teppiche besonderes taschen
+namensliste=Anne Burkhard Carsten Jan Lilli
+ordnerliste=moebel teppiche bilder nicolai besonderes audiocds taschen
 destination_prefix=../eckis-nachlass.github.io
 destination=$(destination_prefix)
 gitprojektordner=../eckis-nachlass
@@ -38,7 +38,7 @@ symbole/symbol-%.jpg: symbole/%.jpg
 # Wenn die $(indices) der Unterordner sich geändert haben, muss index.html
 # ebenfalls neu generiert werden, damit sein Änderungsdatum später ist
 # als in den $(indices) der Unterordner.
-index.html: generate-index $(symbole) $(indices) $(ordnersymbole) changelog.html $(claimslist)
+index.html: generate-index $(symbole) $(indices) $(ordnersymbole) changelog.html $(claimslist) Makefile
 	@echo $@ hängt ab von $^
 	@echo aber nur $? ist neuer als $@
 	NAMENSLISTE="$(namensliste)" ./generate-index $(ordnerliste) > index.html
